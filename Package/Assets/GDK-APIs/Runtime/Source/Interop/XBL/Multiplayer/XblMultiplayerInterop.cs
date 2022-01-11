@@ -421,6 +421,134 @@ namespace XGamingRuntime.Interop
             SizeT searchHandleCount
             );
 
+        //STDAPI XblMultiplayerGetSessionAsync(
+        //    _In_ XblContextHandle xblContext,
+        //    _In_ const XblMultiplayerSessionReference* sessionReference,
+        //    _In_ XAsyncBlock* async
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerGetSessionAsync(
+            XblContextHandle xblContext,
+            [In] ref XblMultiplayerSessionReference sessionRef,
+            XAsyncBlockPtr async
+            );
+
+        //STDAPI XblMultiplayerGetSessionResult(
+        //    _In_ XAsyncBlock* async,
+        //    _Out_ XblMultiplayerSessionHandle* handle
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerGetSessionResult(
+            XAsyncBlockPtr async,
+            out XblMultiplayerSessionHandle handle
+            );
+
+        //STDAPI XblMultiplayerGetSessionByHandleAsync(
+        //    _In_ XblContextHandle xblContext,
+        //    _In_ const char* handleId,
+        //    _In_ XAsyncBlock* async
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerGetSessionByHandleAsync(
+            XblContextHandle xblContext,
+            Byte[] handleId,
+            XAsyncBlockPtr async
+            );
+
+        //STDAPI XblMultiplayerGetSessionByHandleResult(
+        //    _In_ XAsyncBlock* async,
+        //    _Out_ XblMultiplayerSessionHandle* handle
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerGetSessionByHandleResult(
+            XAsyncBlockPtr async,
+            out XblMultiplayerSessionHandle handle
+            );
+
+        //STDAPI XblMultiplayerSessionSetCustomPropertyJson(
+        //    _In_ XblMultiplayerSessionHandle handle,
+        //    _In_z_ const char* name,
+        //    _In_z_ const char* valueJson
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerSessionSetCustomPropertyJson(
+            XblMultiplayerSessionHandle handle,
+            Byte[] name,
+            Byte[] valueJson
+            );
+
+        //STDAPI XblMultiplayerSessionDeleteCustomPropertyJson(
+        //    _In_ XblMultiplayerSessionHandle handle,
+        //    _In_z_ const char* name
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerSessionDeleteCustomPropertyJson(
+            XblMultiplayerSessionHandle handle,
+            Byte[] name
+            );
+
+        //STDAPI_(XblMultiplayerSessionChangeTypes) XblMultiplayerSessionCompare(
+        //    _In_ XblMultiplayerSessionHandle currentSessionHandle,
+        //    _In_ XblMultiplayerSessionHandle oldSessionHandle
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern XblMultiplayerSessionChangeTypes XblMultiplayerSessionCompare(
+            XblMultiplayerSessionHandle currentSessionHandle,
+            XblMultiplayerSessionHandle oldSessionHandle
+            );
+
+        //STDAPI_(const XblMultiplayerSessionReference*) XblMultiplayerSessionSessionReference(
+        //    _In_ XblMultiplayerSessionHandle handle
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal unsafe static extern XblMultiplayerSessionReference* XblMultiplayerSessionSessionReference(
+            XblMultiplayerSessionHandle handle
+            );
+
+        //STDAPI XblMultiplayerSetActivityAsync(
+        //    _In_ XblContextHandle xblContext,
+        //    _In_ const XblMultiplayerSessionReference* sessionReference,
+        //    _In_ XAsyncBlock* async
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerSetActivityAsync(
+            XblContextHandle xblContext,
+            [In] ref XblMultiplayerSessionReference sessionReference,
+            XAsyncBlockPtr async
+            );
+
+        //STDAPI XblMultiplayerClearActivityAsync(
+        //    _In_ XblContextHandle xblContext,
+        //    _In_z_ const char* scid,
+        //    _In_ XAsyncBlock* async
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        internal static extern Int32 XblMultiplayerClearActivityAsync(
+            XblContextHandle xblContext,
+            Byte[] scid,
+            XAsyncBlockPtr async
+            );
+
+        //STDAPI_(void) XblMultiplayerSessionPropertiesSetJoinRestriction(
+        //    _In_ XblMultiplayerSessionHandle handle,
+        //    _In_ XblMultiplayerSessionRestriction joinRestriction
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void XblMultiplayerSessionPropertiesSetJoinRestriction(
+            XblMultiplayerSessionHandle handle,
+            XblMultiplayerSessionRestriction joinRestriction
+            );
+
+        //STDAPI_(void) XblMultiplayerSessionPropertiesSetReadRestriction(
+        //    _In_ XblMultiplayerSessionHandle handle,
+        //    _In_ XblMultiplayerSessionRestriction readRestriction
+        //) XBL_NOEXCEPT;
+        [DllImport(ThunkDllName, CallingConvention = CallingConvention.StdCall)]
+        public static extern void XblMultiplayerSessionPropertiesSetReadRestriction(
+            XblMultiplayerSessionHandle handle,
+            XblMultiplayerSessionRestriction readRestriction
+            );
+
         //STDAPI XblMultiplayerSetSubscriptionsEnabled(
         //    _In_ XblContextHandle xblContext,
         //    _In_ bool subscriptionsEnabled

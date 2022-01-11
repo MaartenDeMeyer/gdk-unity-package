@@ -9,9 +9,12 @@ namespace XGamingRuntime
         public partial class XBL
         {
             public delegate void XblMultiplayerWriteSessionHandleResult(Int32 hresult, XblMultiplayerSessionHandle handle);
+            public delegate void XblMultiplayerGetSessionHandleResult(Int32 hresult, XblMultiplayerSessionHandle handle);
             public delegate void XblMultiplayerCreateSearchHandleResult(Int32 hresult, XblMultiplayerSearchHandle handle);
             public delegate void XblMultiplayerDeleteSearchHandleResult(Int32 hresult);
             public delegate void XblMultiplayerGetSearchHandlesResult(Int32 hresult, XblMultiplayerSearchHandle[] searchHandles);
+            public delegate void XblMultiplayerSetActivityHandleResult(Int32 hresult);
+            public delegate void XblMultiplayerClearActivityHandleResult(Int32 hresult);
 
             public delegate void XblMultiplayerSessionChangedHandler(XblMultiplayerSessionChangeEventArgs args);
             public delegate void XblMultiplayerSessionSubscriptionLostHandler();
@@ -622,6 +625,198 @@ namespace XGamingRuntime
                     AsyncHelpers.CleanupAsyncBlock(asyncBlock);
                     completionRoutine(hr, new XblMultiplayerSearchHandle[0]);
                 }
+            }
+
+            public static void XblMultiplayerGetSessionAsync(
+                XblContextHandle xblContext,
+                XblMultiplayerSessionReference sessionRef,
+                XblMultiplayerGetSessionHandleResult completionRoutine
+                )
+            {
+                if (xblContext == null || sessionRef == null)
+                {
+                    completionRoutine(HR.E_INVALIDARG, default(XblMultiplayerSessionHandle));
+                    return;
+                }
+
+                XAsyncBlockPtr asyncBlock = AsyncHelpers.WrapAsyncBlock(defaultQueue.handle, (XAsyncBlockPtr block) =>
+                {
+                    Interop.XblMultiplayerSessionHandle result;
+                    Int32 hresult = XblInterop.XblMultiplayerGetSessionResult(block, out result);
+                    if (HR.FAILED(hresult))
+                    {
+                        completionRoutine(hresult, default(XblMultiplayerSessionHandle));
+                        return;
+                    }
+
+                    completionRoutine(hresult, new XblMultiplayerSessionHandle(result));
+                });
+
+                var interopSessionRef = new Interop.XblMultiplayerSessionReference(sessionRef);
+
+                Int32 hr = XblInterop.XblMultiplayerGetSessionAsync(
+                    xblContext.InteropHandle,
+                    ref interopSessionRef,
+                    asyncBlock);
+
+                if (HR.FAILED(hr))
+                {
+                    AsyncHelpers.CleanupAsyncBlock(asyncBlock);
+                    completionRoutine(hr, default(XblMultiplayerSessionHandle));
+                }
+            }
+
+            public static void XblMultiplayerGetSessionByHandleAsync(
+                XblContextHandle xblContext,
+                string handleId,
+                XblMultiplayerGetSessionHandleResult completionRoutine
+                )
+            {
+                if (xblContext == null || handleId == null)
+                {
+                    completionRoutine(HR.E_INVALIDARG, default(XblMultiplayerSessionHandle));
+                    return;
+                }
+
+                XAsyncBlockPtr asyncBlock = AsyncHelpers.WrapAsyncBlock(defaultQueue.handle, (XAsyncBlockPtr block) =>
+                {
+                    Interop.XblMultiplayerSessionHandle result;
+                    Int32 hresult = XblInterop.XblMultiplayerGetSessionByHandleResult(block, out result);
+                    if (HR.FAILED(hresult))
+                    {
+                        completionRoutine(hresult, default(XblMultiplayerSessionHandle));
+                        return;
+                    }
+
+                    completionRoutine(hresult, new XblMultiplayerSessionHandle(result));
+                });
+
+                Int32 hr = XblInterop.XblMultiplayerGetSessionByHandleAsync(
+                    xblContext.InteropHandle,
+                    Converters.StringToNullTerminatedUTF8ByteArray(handleId),
+                    asyncBlock);
+
+                if (HR.FAILED(hr))
+                {
+                    AsyncHelpers.CleanupAsyncBlock(asyncBlock);
+                    completionRoutine(hr, default(XblMultiplayerSessionHandle));
+                }
+            }
+
+            public static Int32 XblMultiplayerSessionSetCustomPropertyJson(
+                XblMultiplayerSessionHandle handle,
+                string name,
+                string valueJson
+                )
+            {
+                return XblInterop.XblMultiplayerSessionSetCustomPropertyJson(handle.InteropHandle, Converters.StringToNullTerminatedUTF8ByteArray(name), Converters.StringToNullTerminatedUTF8ByteArray(valueJson));
+            }
+
+            public static Int32 XblMultiplayerSessionDeleteCustomPropertyJson(
+                XblMultiplayerSessionHandle handle,
+                string name
+                )
+            {
+                return XblInterop.XblMultiplayerSessionDeleteCustomPropertyJson(handle.InteropHandle, Converters.StringToNullTerminatedUTF8ByteArray(name));
+            }
+
+            public static XblMultiplayerSessionChangeTypes XblMultiplayerSessionCompare(
+                XblMultiplayerSessionHandle currentSessionHandle,
+                XblMultiplayerSessionHandle oldSessionHandle
+                )
+            {
+                if (currentSessionHandle == null || oldSessionHandle == null)
+                    return XblMultiplayerSessionChangeTypes.Everything;
+
+                return XblInterop.XblMultiplayerSessionCompare(currentSessionHandle.InteropHandle, oldSessionHandle.InteropHandle);
+            }
+
+            public static XblMultiplayerSessionReference XblMultiplayerSessionSessionReference(
+                XblMultiplayerSessionHandle handle
+                )
+            {
+                unsafe
+                {
+                    Interop.XblMultiplayerSessionReference* interop = null;
+                    if (handle != null)
+                    {
+                        interop = XblInterop.XblMultiplayerSessionSessionReference(handle.InteropHandle);
+                    }
+
+                    if (interop == null)
+                    {
+                        return null;
+                    }
+
+                    return new XblMultiplayerSessionReference(*interop);
+                }
+            }
+
+            public static void XblMultiplayerSetActivityAsync(
+                XblContextHandle xblContext,
+                XblMultiplayerSessionReference sessionReference,
+                XblMultiplayerSetActivityHandleResult completionRoutine
+                )
+            {
+                if (xblContext == null || sessionReference == null)
+                {
+                    completionRoutine(HR.E_INVALIDARG);
+                    return;
+                }
+
+                XAsyncBlockPtr asyncBlock = AsyncHelpers.WrapAsyncBlock(SDK.defaultQueue.handle, (XAsyncCompletionRoutine)(block => completionRoutine(XGRInterop.XAsyncGetStatus(block, false))));
+                var sessionReferenceInterop = new Interop.XblMultiplayerSessionReference(sessionReference);
+                int hr = XblInterop.XblMultiplayerSetActivityAsync(xblContext.InteropHandle, ref sessionReferenceInterop, asyncBlock);
+
+                if (HR.FAILED(hr))
+                {
+                    AsyncHelpers.CleanupAsyncBlock(asyncBlock);
+                    completionRoutine(hr);
+                }
+            }
+
+            public static void XblMultiplayerClearActivityAsync(
+                XblContextHandle xblContext,
+                string scid,
+                XblMultiplayerClearActivityHandleResult completionRoutine
+                )
+            {
+                if (xblContext == null || scid == null)
+                {
+                    completionRoutine(HR.E_INVALIDARG);
+                    return;
+                }
+
+                XAsyncBlockPtr asyncBlock = AsyncHelpers.WrapAsyncBlock(SDK.defaultQueue.handle, (XAsyncCompletionRoutine)(block => completionRoutine(XGRInterop.XAsyncGetStatus(block, false))));
+                int hr = XblInterop.XblMultiplayerClearActivityAsync(xblContext.InteropHandle, Converters.StringToNullTerminatedUTF8ByteArray(scid), asyncBlock);
+
+                if (HR.FAILED(hr))
+                {
+                    AsyncHelpers.CleanupAsyncBlock(asyncBlock);
+                    completionRoutine(hr);
+                }
+            }
+
+            public static void XblMultiplayerSessionPropertiesSetJoinRestriction(
+                XblMultiplayerSessionHandle handle,
+                XblMultiplayerSessionRestriction joinRestriction
+                )
+            {
+                if (handle == null)
+                    return;
+
+                XblInterop.XblMultiplayerSessionPropertiesSetJoinRestriction(handle.InteropHandle, joinRestriction);
+            }
+
+            public static void XblMultiplayerSessionPropertiesSetReadRestriction(
+                XblMultiplayerSessionHandle handle,
+                XblMultiplayerSessionRestriction readRestriction
+                )
+            {
+                if (handle == null)
+                    return;
+
+                XblInterop.XblMultiplayerSessionPropertiesSetReadRestriction(handle.InteropHandle, readRestriction);
             }
 
             public static Int32 XblMultiplayerSetSubscriptionsEnabled(
